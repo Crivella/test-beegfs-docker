@@ -1,0 +1,37 @@
+---
+# - name: Clean dirs
+#   become: true
+#   shell: "rm -rf /beegfs/{{ item }}/* /beegfs/{{ item }}/.*"
+#   with_items:
+#     - mgmtd
+#   failed_when: false
+
+- name: Create directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "root"
+  with_items:
+    - /beegfs/mgmtd
+
+- name: Check that mgmtd init is done
+  stat:
+    path: /beegfs/mgmtd/originalNodeID
+  register: mgmtd_init
+
+- name: Run initialization scripts
+  become: true
+  shell: "{{ item }}"
+  with_items:
+    - /opt/beegfs/sbin/beegfs-setup-mgmtd -p /beegfs/mgmtd
+  when: mgmtd_init.stat.exists == false
+
+- name: Start management services
+  become: true
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  with_items:
+    - beegfs-mgmtd.service

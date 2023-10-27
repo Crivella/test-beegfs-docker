@@ -1,0 +1,59 @@
+---
+- name: Add key from BeeGFS
+  ansible.builtin.apt_key:
+    url: https://www.beegfs.io/release/beegfs_7.2.5/gpg/DEB-GPG-KEY-beegfs
+    state: present
+
+- name: Add repository into sources list
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64] https://www.beegfs.io/release/beegfs_7.2.5 focal non-free
+    state: present
+
+- name: Install BeeGFS packages
+  become: true
+  apt:
+    name:
+      - beegfs-mgmtd
+      - beegfs-meta
+      - beegfs-storage
+      - beegfs-client
+      - beegfs-helperd
+      - beegfs-utils
+      - beegfs-common
+    state: present
+    update_cache: yes
+
+# This is not needed for beegfs, however when submitting jobs
+# on compute5, if there are `module load xxx` in slurm submit script,
+# it needs lua to correctly load them.
+- name: Install required packages
+  become: true
+  apt:
+    name:
+      - kmod
+    state: present
+    update_cache: yes
+
+# - name: Stop all services
+#   become: true
+#   service:
+#     name: "{{ item }}"
+#     enabled: no
+#     state: stopped
+#   with_items:
+#     - beegfs-storage.service
+#     - beegfs-meta.service
+#     - beegfs-helperd.service
+#     - beegfs-mgmtd.service
+#     - beegfs-client.service
+
+# Note
+# .. if path ends with "/", only inside contents of that directory are copied to destination.
+# ... if it does not end with "/", the directory itself with all contents is copied.
+- name: Copy conf files
+  become: true
+  ansible.builtin.copy:
+    src: "{{ inventory_hostname }}/"
+    dest: /etc/beegfs/
+    owner: root
+    group: root

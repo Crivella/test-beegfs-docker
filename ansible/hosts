@@ -1,0 +1,28 @@
+
+beegfs:
+  children:
+    beegfs_control:
+      hosts:
+        172.18.0.2:
+    beegfs_meta:
+      hosts:
+        172.18.0.2:
+        172.18.0.3:
+        172.18.0.4:
+    beegfs_storage:
+      hosts:
+        172.18.0.2:
+        172.18.0.3:
+        172.18.0.4:
+    beegfs_client:
+      hosts:
+        172.18.0.2:
+        172.18.0.3:
+        172.18.0.4:
+  
+  vars:
+    ansible_user: root
+    ansible_ssh_pass: root
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+
+

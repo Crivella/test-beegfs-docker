@@ -1,0 +1,40 @@
+---
+# - name: Clean dirs
+#   become: true
+#   shell: "rm -rf /beegfs/{{ item }}/* /beegfs/{{ item }}/.*"
+#   with_items:
+#     - meta
+#     - storage
+#   failed_when: false
+
+- name: Create directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "root"
+  with_items:
+    - /beegfs/storage
+
+- name: Check that storage init is done
+  stat:
+    path: /beegfs/storage/originalNodeID
+  register: storage_init
+
+- name: Run initialization scripts
+  become: true
+  shell: "{{ item }}"
+  with_items:
+    - "/opt/beegfs/sbin/beegfs-setup-storage -p /beegfs/storage -s {{ inventory_hostname[-1] }} -i {{ inventory_hostname[-1] }}"
+  when: storage_init.stat.exists == false
+
+    
+- name: Start storage services
+  become: true
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  with_items:
+    - beegfs-storage.service
+

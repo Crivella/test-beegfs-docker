@@ -1,0 +1,80 @@
+networks:
+  network:
+    name: beegfs-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+          gateway: 172.18.0.1
+services:
+  combo1:
+    image: "test-beegfs"
+    hostname: combo1
+    # Just needed for mounting beegfs inside docker (together with having to install beegfs-client on host and add the module to the kernel)
+    privileged: true
+    ports:
+      - "8003:8003"
+      - "8004:8004"
+      - "8005:8005"
+      - "8006:8006"
+      - "8008:8008"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - ./meta1:/beegfs/meta
+      - ./storage1:/beegfs/storage
+      - ./scripts:/scripts
+    tmpfs:
+      - /run
+      - /run/lock
+    # https://forums.docker.com/t/mount-permission-denied-inside-container/67991/10
+    cap_add:
+      - "SYS_ADMIN"
+    networks:
+      network:
+        ipv4_address: 172.18.0.2
+
+  combo2:
+    image: "test-beegfs"
+    hostname: combo2
+    privileged: true
+    ports:
+      - "9903:9903"
+      - "9904:9904"
+      - "9905:9905"
+      - "9906:9906"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - ./meta2:/beegfs/meta
+      - ./storage2:/beegfs/storage
+    tmpfs:
+      - /run
+      - /run/lock
+    cap_add:
+      - "SYS_ADMIN"
+    networks:
+      network:
+        ipv4_address: 172.18.0.3
+
+  combo3:
+    image: "test-beegfs"
+    hostname: combo3
+    privileged: true
+    ports:
+      - "9703:9703"
+      - "9704:9704"
+      - "9705:9705"
+      - "9706:9706"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - ./meta3:/beegfs/meta
+      - ./storage3:/beegfs/storage
+    tmpfs:
+      - /run
+      - /run/lock
+    cap_add:
+      - "SYS_ADMIN"
+    networks:
+      network:
+        ipv4_address: 172.18.0.4
+  # storage4:
+

@@ -1,0 +1,36 @@
+---
+# Note: Pass variables to roles using the 'vars' dictionary!
+# If variables are passed on the same indentation level as the role, the variable is
+# set correctly inside the role, but following roles will read the *default*
+# value of the variable (as defined inside the role).
+
+- name: set up BeeGFS
+  hosts: beegfs
+  roles:
+    - role: beegfs_base
+      tags: beegfs_base
+
+- name: start BeeGFS management service
+  hosts: beegfs_control
+  roles:
+    - role: beegfs_control
+      tags: beegfs_control
+
+- name: start BeeGFS meta service
+  hosts: beegfs_meta
+  roles:
+    - role: beegfs_meta
+      tags: beegfs_meta
+
+- name: start BeeGFS storage services
+  hosts: beegfs_storage
+  roles:
+    - role: beegfs_storage
+      tags: beegfs_storage
+
+- name: start BeeGFS client services
+  hosts: beegfs_client
+  roles:
+    - role: beegfs_client
+      tags: beegfs_client
+...

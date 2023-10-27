@@ -1,0 +1,29 @@
+---
+# - name: Stop all services
+#   become: true
+#   service:
+#     name: "{{ item }}"
+#     enabled: no
+#     state: stopped
+#   with_items:
+#     - beegfs-helperd.service
+#     - beegfs-client.service
+
+- name: Create directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "root"
+  with_items:
+    - /beegfs/mnt
+
+- name: Start all services
+  become: true
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  with_items:
+    - beegfs-helperd.service
+    - beegfs-client.service

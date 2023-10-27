@@ -1,0 +1,29 @@
+- name: Create directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "root"
+  with_items:
+    - /beegfs/meta
+
+- name: Check that meta init is done
+  stat:
+    path: /beegfs/meta/originalNodeID
+  register: meta_init
+
+- name: Run initialization scripts
+  become: true
+  shell: "{{ item }}"
+  with_items:
+    - "/opt/beegfs/sbin/beegfs-setup-meta -p /beegfs/meta -m {{ groups['beegfs_control'] | first }} -s {{ inventory_hostname[-1] }}"
+  when: meta_init.stat.exists == false
+
+- name: Start client services
+  become: true
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  with_items:
+    - beegfs-meta.service
