@@ -9,7 +9,7 @@ networks:
 services:
   combo1:
     image: "test-beegfs"
-    hostname: combo1
+    hostname: combo1 # Need to be fixed to avoid changing originalNodeID on an already initialized node for adding nodes
     # Just needed for mounting beegfs inside docker (together with having to install beegfs-client on host and add the module to the kernel)
     privileged: true
     ports:
